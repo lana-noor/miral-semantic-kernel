@@ -1,0 +1,9 @@
+asyncio
+uvicorn
+openai
+python-dotenv
+semantic-kernel
+azure-search-documents
+fastapi
+requests
+streamlit
