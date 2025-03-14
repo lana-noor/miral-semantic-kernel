@@ -6,18 +6,6 @@ A **Generative AI-powered ITSM automation system** that allows users to request 
 
 ## 📌 How It Works
 
-- **User Prompt:** The user enters an IT request in the terminal (e.g., *“Reset my password”*).
-- **Intent Detection:** Azure OpenAI via Semantic Kernel interprets the user's request.
-- **Knowledge Base Check:** The system first checks for a relevant solution in the Emirates Knowledge Base using Azure AI Search.
-- **Workflow Routing:** If the request matches a known workflow (password resets, incident creation, etc.), it is routed to the appropriate function in `sk_plugins/`.
-- **Clarification:** If the prompt is ambiguous, the system will ask for more details or present choices.
-- **Staff ID Verification:** Although a staff ID check is implemented (and will later be replaced with SSO), for now the system assumes the staff ID is already known.
-- **Execution and Feedback:** The appropriate function executes the task and returns real-time feedback to the user.
-
----
-
-## 📌 How It Works
-
 1️⃣ **User enters an IT request** in the UI (e.g., *“Reset my Aviva password”*).  
 2️⃣ **Azure OpenAI detects the intent** (e.g., *Password Reset* or *Disk Cleanup*).  
 3️⃣ **Semantic Kernel (SK) routes the request** to the correct workflow.  
