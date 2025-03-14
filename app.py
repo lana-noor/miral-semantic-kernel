@@ -3,8 +3,12 @@ import asyncio
 from semantic_kernel import Kernel
 from semantic_kernel.functions import kernel_function
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
-from semantic_kernel.connectors.ai.function_choice_behavior import FunctionChoiceBehavior
-from semantic_kernel.connectors.ai.chat_completion_client_base import ChatCompletionClientBase
+from semantic_kernel.connectors.ai.function_choice_behavior import (
+    FunctionChoiceBehavior,
+)
+from semantic_kernel.connectors.ai.chat_completion_client_base import (
+    ChatCompletionClientBase,
+)
 from semantic_kernel.contents.chat_history import ChatHistory
 from semantic_kernel.functions.kernel_arguments import KernelArguments
 from semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.azure_chat_prompt_execution_settings import (
@@ -15,6 +19,13 @@ from sk_plugins.aviva_password_reset import AvivaPasswordReset
 from sk_plugins.generic_password_reset import GenericPasswordReset
 from sk_plugins.etech_log_pin_reset import EtchLogPinReset
 from sk_plugins.incident_creation import IncidentCreation
+
+################
+from semantic_kernel.connectors.memory.azure_ai_search import AzureAISearchStore
+from azure.search.documents.indexes import SearchIndexClient
+################
+
+
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -36,7 +47,7 @@ async def main():
         deployment_name=AZURE_OPENAI_DEPLOYMENT,
         api_key=AZURE_OPENAI_API_KEY,
         base_url=AZURE_OPENAI_ENDPOINT,
-        api_version=AZURE_OPENAI_API_VERSION
+        api_version=AZURE_OPENAI_API_VERSION,
     )
     kernel.add_service(chat_completion)
 
@@ -68,6 +79,10 @@ async def main():
 
     # Create a history of the conversation
     history = ChatHistory()
+    
+    
+    vector_store = AzureAISearchStore()
+
 
     # Initiate a back-and-forth chat
     userInput = None
@@ -95,7 +110,7 @@ async def main():
         # Add the message from the agent to the chat history
         history.add_message(result)
 
+
 # Run the main function
 if __name__ == "__main__":
     asyncio.run(main())
-    
