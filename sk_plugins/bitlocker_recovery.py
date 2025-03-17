@@ -7,5 +7,6 @@ class BitLockerRecovery:
     )
     def bitlocker_recovery(self, device_id ,staff_id: str) -> str:
         """Retrieve a BitLocker recovery key for a device."""
+        # Add Bitlocker Logic Here
         
         return f"BitLocker recovery key for device {device_id} is ABCD-1234-EFGH-5678."

@@ -1,4 +1,6 @@
 import os
+import json
+import uuid
 import asyncio
 from semantic_kernel import Kernel
 from semantic_kernel.functions import kernel_function
@@ -23,6 +25,7 @@ from sk_plugins.incident_creation import IncidentCreation
 from sk_plugins.ai_search import AiSearch
 from sk_plugins.staff_id_verification import StaffIDVerification
 
+from azure.cosmos import CosmosClient
 
 from dotenv import load_dotenv
 
@@ -84,7 +87,7 @@ async def main():
 
     # Create a history of the conversation
     history = ChatHistory()
-    
+
     prompt = """
 You are an AI Assistant for the Emirates internal team, designed to provide insights and automate specific tasks and workflows. Your responsibilities include IT support, configuring Outlook, managing shared mailboxes, and facilitating password resets.
 You have access to Emirates Knowledge Base articles via Azure AI Search to retrieve relevant information on configuring Outlook, accessing shared mailboxes, and troubleshooting email-related issues. When a user requests assistance with these topics, invoke the SearchAISearch function to provide them with detailed and relevant information.
@@ -142,7 +145,7 @@ Configuration Steps:
 
 Following these steps will successfully configure your shared or generic mailbox in Outlook."
 """
-    
+
     history.add_system_message(prompt)
 
     # Initiate a back-and-forth chat
@@ -170,6 +173,29 @@ Following these steps will successfully configure your shared or generic mailbox
 
         # Add the message from the agent to the chat history
         history.add_message(result)
+        # print(history.model_dump_json())
+        save_history(history.serialize())
+
+
+def save_history(history_json):
+    COSMOSDB_URL = os.getenv(
+        "COSMOSDB_URL", "https://cosmos-ek-itsm-ddemo-22v.documents.azure.com:443/"
+    )
+    COSMOSDB_KEY = os.getenv(
+        "COSMOSDB_KEY",
+        "kQyd4iODo0Qrb4PliJ3dpUI0O7FYU9q54lCOkpkiBHjBCYETRS7VpoL7qE7WIg6V4BUIAsvVvOJrACDbeQ26Kg==",
+    )
+    client = CosmosClient(COSMOSDB_URL, credential=COSMOSDB_KEY)
+    DATABASE_NAME = os.getenv("AZURE_COSMOSDB_DATABASE_ID", "GenAIBot")
+    database = client.get_database_client(DATABASE_NAME)
+    CONTAINER_NAME = os.getenv("AZURE_COSMOSDB_CONTAINER_ID", "Conversations")
+    container = database.get_container_client(CONTAINER_NAME)
+    # Convert string to dict and add an "id"
+    conversation_data = {
+        "id": str(uuid.uuid4()),
+        "conversation": json.loads(history_json),
+    }
+    container.upsert_item(conversation_data)
 
 
 # Run the main function
